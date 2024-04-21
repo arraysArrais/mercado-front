@@ -3,6 +3,8 @@ import '@mantine/core/styles.css';
 import { ModalsProvider } from '@mantine/modals';
 import { MainRoutes } from './routes/MainRoutes';
 import { Notifications } from '@mantine/notifications';
+import '@mantine/core/styles.layer.css';
+import 'mantine-datatable/styles.layer.css';
 
 const myColor: MantineColorsTuple = [
   '#f3edff',

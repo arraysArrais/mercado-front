@@ -6,7 +6,7 @@ import { ProtectRoute } from './ProtectRoute'
 import { NotFound } from '../pages/NotFound/NotFound'
 import { BasicAppShell } from '../layout/BasicAppShell'
 import { RedirectLogin } from './RedirectLogin'
-import { Teste } from './Teste'
+import { Venda } from '../pages/Venda/Venda'
 
 
 export const MainRoutes = () => {
@@ -14,7 +14,7 @@ export const MainRoutes = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<BasicAppShell><Home /></BasicAppShell>} />
-                <Route path="/teste" element={<BasicAppShell><Teste /></BasicAppShell>} />
+                <Route path="/teste" element={<BasicAppShell><Venda /></BasicAppShell>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

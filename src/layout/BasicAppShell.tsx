@@ -31,7 +31,6 @@ export const BasicAppShell = ({ children }: Props) => {
                 </Group>
             </AppShell.Header>
             <AppShell.Navbar>
-
                 <SimpleNavbar />
             </AppShell.Navbar>
             <AppShell.Main>
