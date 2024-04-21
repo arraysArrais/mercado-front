@@ -1,33 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { createTheme, MantineColorsTuple, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
+import { ModalsProvider } from '@mantine/modals';
+import { MainRoutes } from './routes/MainRoutes';
+import { Notifications } from '@mantine/notifications';
+
+const myColor: MantineColorsTuple = [
+  '#f3edff',
+  '#e0d7fa',
+  '#beabf0',
+  '#9a7ce6',
+  '#7c56de',
+  '#683dd9',
+  '#5f2fd8',
+  '#4f23c0',
+  '#451eac',
+  '#3a1899'
+];
+
+const theme = createTheme({
+  colors: {
+    myColor,
+  },
+  primaryColor: 'indigo',
+  breakpoints: {
+    xs: '500',
+    sm: '800',
+    md: '1000',
+    lg: '1200',
+    xl: '1400',
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
+      <ModalsProvider>
+        <Notifications />
+        <MainRoutes />
+      </ModalsProvider>
+    </MantineProvider>
   )
 }
 
