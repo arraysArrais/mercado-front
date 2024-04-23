@@ -7,6 +7,7 @@ import { NotFound } from '../pages/NotFound/NotFound'
 import { BasicAppShell } from '../layout/BasicAppShell'
 import { RedirectLogin } from './RedirectLogin'
 import { Venda } from '../pages/Venda/Venda'
+import { ListVenda } from '../pages/ListVenda.tsx/ListVenda'
 
 
 export const MainRoutes = () => {
@@ -14,7 +15,8 @@ export const MainRoutes = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<BasicAppShell><Home /></BasicAppShell>} />
-                <Route path="/teste" element={<BasicAppShell><Venda /></BasicAppShell>} />
+                <Route path="/venda" element={<BasicAppShell><Venda /></BasicAppShell>} />
+                <Route path="/consultarVenda" element={<BasicAppShell><ListVenda /></BasicAppShell>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

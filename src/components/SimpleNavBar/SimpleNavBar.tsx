@@ -3,8 +3,9 @@ import { Tooltip, UnstyledButton, Stack, rem } from '@mantine/core';
 import {
     IconHome2,
     IconLogout,
-    IconPigMoney,
     IconPlus,
+    IconShoppingCart,
+    IconShoppingCartSearch
 } from '@tabler/icons-react';
 import classes from './NavbarMinimal.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -28,8 +29,9 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 
 const mockdata = [
     { icon: IconHome2, label: 'Home', link: '/' },
-    { icon: IconPigMoney, label: 'Menu item 1', link: '/teste' },
-    { icon: IconPlus, label: 'Menu item 2', link: '/teste2' },
+    { icon: IconShoppingCart, label: 'Cadastrar venda', link: '/venda' },
+    { icon: IconShoppingCartSearch, label: 'Listar Vendas', link: '/consultarVenda'},
+    { icon: IconPlus, label: 'Menu item 2', link: '/teste' },
 ];
 
 const logoutSection = [

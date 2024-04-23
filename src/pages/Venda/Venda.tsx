@@ -100,8 +100,6 @@ export const Venda = () => {
         const result = await apiServices.sendTransaction(item);
     }
 
-
-
     return (
         <Container size={'100%'} id='container'>
             <Title order={1} id='titulo'>Caixa aberto</Title>
