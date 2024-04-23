@@ -33,5 +33,9 @@ export default () => {
             codigo = codigo.replace("'", ""); 
             return request('get', `/item`, {codigo}, localStorage.getItem('token'))
         },
+        sendTransaction: async (sale: any) => {
+            console.log("payload: ", JSON.stringify(sale))
+            return request('post', `/transaction`, sale, localStorage.getItem('token'))
+        },
     }
 }

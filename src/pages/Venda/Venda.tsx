@@ -96,6 +96,10 @@ export const Venda = () => {
         //TODO: notificação de adição
     }
 
+    const handleCloseSaleBtn = async () => {
+        const result = await apiServices.sendTransaction(item);
+    }
+
 
 
     return (
@@ -143,7 +147,7 @@ export const Venda = () => {
                 <Stack align='end'>
                     <Text size='lg' fw={500}>Total: R$ {valorTotal.toString()}</Text>
                     <Text size='xs' fw={500}>Impostos: R$ {imposto.toString()}</Text>
-                    <Button >Concluir</Button>
+                    <Button onClick={handleCloseSaleBtn}>Concluir</Button>
                 </Stack>
             </Flex>
         </Container>
