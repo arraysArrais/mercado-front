@@ -29,9 +29,9 @@ const request = async (method: string, endpoint: string, params: any, token: str
 
 export default () => {
     return {
-        //TODO: implemetar camada de interação com o backend  
-        getSomething: async () => {
-            return request('get', '/api/url', {}, localStorage.getItem('token'))
+        getItemByCodigo: async (codigo: string) => {
+            codigo = codigo.replace("'", ""); 
+            return request('get', `/item`, {codigo}, localStorage.getItem('token'))
         },
     }
 }
