@@ -32,6 +32,11 @@ export const Venda = () => {
             setImposto(+totalImpostos.toFixed(2))
         }
 
+        if(item.length == 0){
+            setValorTotal(0);
+            setImposto(0);
+        }
+
     }, [item])
 
     const columns = [
