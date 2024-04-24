@@ -134,13 +134,24 @@ export const Produto = () => {
                 <Flex justify={'end'} gap={30} mt={30}>
 
                     <Button onClick={async () => {
-                        await apiServices.deleteProduct(delProduto)
+                        let result = await apiServices.deleteProduct(delProduto)
                         setProducts(temporaryProducts);
-                        notifications.show({
-                            title: 'Alerta',
-                            message: 'Produto excluído!',
-                            color: 'yellow'
-                        })
+
+                        if(result.message){
+                            notifications.show({
+                                title: 'Alerta',
+                                message: 'Produto excluído!',
+                                color: 'yellow'
+                            })
+                        }
+                        else{
+                            notifications.show({
+                                title: 'Erro',
+                                message: "Erro ao excluir produto, verifique se o mesmo não está vinculado a uma venda",
+                                color: 'red'
+                            });
+                        }
+                        
                         setDelProduto(0);
                         closeDelModal();
                     }}>Sim</Button>
