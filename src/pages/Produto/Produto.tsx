@@ -204,7 +204,7 @@ export const Produto = () => {
                                 value={selectedCategoryId}
                                 onChange={(selectedOption) => {
                                     setSelectedCategoryId(selectedOption?.valueOf())
-                                    editForm.setFieldValue('category_id', selectedOption?.valueOf())
+                                    editForm.setFieldValue('category_id', (selectedOption?.valueOf() == null ? '' : selectedOption?.valueOf()))
                                 }}
                                 error={editForm.errors.category_id}
                             />
@@ -363,6 +363,12 @@ export const Produto = () => {
                                     size="sm"
                                     color="yellow"
                                     onClick={async () => {
+                                        setName('')
+                                        setDescription('')
+                                        setPrice(0)
+                                        setCode('')
+
+                                        setSelectedCategoryId(null)
                                         setEditProduto(produto.id)
                                         openEditModal();
                                     }}
