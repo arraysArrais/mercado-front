@@ -1,12 +1,13 @@
-import { ActionIcon, Box, Button, Container, Flex, Group, InputBase, Modal, NumberInput, Stack, Text, TextInput, Title } from "@mantine/core"
+import { ActionIcon, Box, Button, Container, Flex, Group, Modal, NumberInput, Stack, Text, TextInput, Title } from "@mantine/core"
 import { DataTable } from 'mantine-datatable';
 import { CategoriaProps } from "./types";
 import { useEffect, useState } from "react";
 import { IconAbc, IconPencil, IconPercentage, IconTrash } from '@tabler/icons-react';
-import { IMaskInput } from 'react-imask';
 import useApi from '../../services/services';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from "@mantine/hooks";
+import { useForm, zodResolver } from "@mantine/form";
+import { z } from 'zod';
 
 export const Categoria = () => {
     const [categorias, setCategorias] = useState<CategoriaProps[]>([]);
@@ -19,6 +20,19 @@ export const Categoria = () => {
     const [editModal, { open: openEditModal, close: closeEditModal }] = useDisclosure(false); //edição 
     const [delCategoria, setDelCategoria] = useState<any>(0); //usado para armazenar o ID da categoria em caso de exclusão
     const [editCategoria, setEditCategoria] = useState<any>(0); //usado para armazenar a categoria em caso de edição
+
+    const schema = z.object({
+        name: z.string().min(3, { message: 'Nome deve ter pelo menos 3 caracteres' }),
+        tax: z.number().min(1, { message: 'O imposto deve ser maior que zero' }),
+    });
+
+    const form = useForm({
+        initialValues: {
+            name: '',
+            tax: 0
+        },
+        validate: zodResolver(schema),
+    });
 
     useEffect(() => {
 
@@ -71,13 +85,40 @@ export const Categoria = () => {
             tax_parcent: impostoInput
         })
         setCategorias(currentCategories);
+
+        setImpostoInput(0);
+        setNomeInput('');
+        form.setFieldValue('name', '')
+        form.setFieldValue('tax', 0)
+    }
+
+    const handleEditCategoriaBtn = async () => {
+        let result = await apiServices.updateCategory({
+            name: nomeInput,
+            tax_percent: impostoInput,
+        }, editCategoria);
+
+        if (result[0].id) {
+            notifications.show({
+                title: 'Sucesso',
+                message: 'Alteração realizada',
+                color: 'green'
+            });
+        }
+        else {
+            notifications.show({
+                title: 'Erro',
+                message: result.error,
+                color: 'red'
+            });
+        }
+        closeEditModal();
     }
     return (
-        <Container size={'100%'}>
+        <Container size={'100%'} >
             <Modal opened={opened} onClose={close} title="Confirmação">
                 <Text>Tem certeza que deseja excluir o item?</Text>
                 <Flex justify={'end'} gap={30} mt={30}>
-
                     <Button onClick={async () => {
                         let result = await apiServices.deleteCategory(delCategoria);
                         setCategorias(temporaryItem)
@@ -105,55 +146,53 @@ export const Categoria = () => {
             </Modal>
             <Modal opened={editModal} onClose={closeEditModal} title="Edição de categoria" centered>
                 <Box >
-                    <Group justify={"center"}>
-                        <TextInput
-                            placeholder="Novo nome"
-                            leftSection={<IconAbc size={16} />}
-                            value={nomeInput}
-                            onChange={(e) => setNomeInput(e.currentTarget.value)} />
-                        <NumberInput
-                            placeholder="Novo Imposto"
-                            allowNegative={false}
-                            decimalScale={2}
-                            decimalSeparator=","
-                            min={0}
-                            max={10000}
-                            hideControls
-                            value={impostoInput}
-                            onChange={(e) => {
-                                setImpostoInput(e.valueOf())
-                            }}
-                            leftSection={<IconPercentage size={16} />}
-                        />
-                    </Group>
-                </Box>
-                <Group mt={20} justify="center">
-                    <Button onClick={async () => {
-                        let result = await apiServices.updateCategory({
-                            name: nomeInput,
-                            tax_percent: impostoInput,
-                        }, editCategoria);
+                    <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        const validationResult = form.validate();
 
-                        if (result[0].id) {
-                            notifications.show({
-                                title: 'Sucesso',
-                                message: 'Alteração realizada',
-                                color: 'green'
-                            });
+                        if (!validationResult.hasErrors) {
+                            handleEditCategoriaBtn();
                         }
-                        else {
-                            notifications.show({
-                                title: 'Erro',
-                                message: result.error,
-                                color: 'red'
-                            });
-                        }
-                        closeEditModal();
-                    }} color="orange">Alterar</Button>
-                </Group>
+
+                    }}>
+                        <Group justify={"center"}>
+                            <TextInput
+                                placeholder="Novo nome"
+                                leftSection={<IconAbc size={16} />}
+                                value={form.values.name}
+                                error={form.errors.name}
+                                onChange={(e) => {
+                                    form.setFieldValue('name', e.currentTarget.value)
+                                    setNomeInput(e.currentTarget.value)
+                                }} />
+                            <NumberInput
+                                placeholder="Novo Imposto"
+                                allowNegative={false}
+                                decimalScale={2}
+                                decimalSeparator=","
+                                min={0}
+                                max={10000}
+                                hideControls
+                                value={form.values.tax}
+                                error={form.errors.tax}
+                                onChange={(e) => {
+                                    form.setFieldValue('tax', +e.valueOf())
+                                    setImpostoInput(e.valueOf())
+                                }}
+                                leftSection={<IconPercentage size={16} />}
+                            />
+                        </Group>
+                        <Group mt={20} justify="center">
+                            <Button type="submit" color="orange">Alterar</Button>
+                        </Group>
+                    </form>
+                </Box>
+
             </Modal>
             <Title order={2} id="titulo">Categorias</Title>
             <DataTable
+                withTableBorder
+                borderRadius={10}
                 columns={[
                     //{ accessor: 'id' },
                     { accessor: 'name', title: 'Nome' },
@@ -194,37 +233,54 @@ export const Categoria = () => {
 
                 ]}
                 records={categorias}
-                height={500}
+                height={400}
                 noRecordsText="Nenhuma categoria encontrada"
             />
-            <Group mt={50}>
-                <TextInput
-                    placeholder="Insira o nome"
-                    label="Nome" description="Nome da categoria"
-                    leftSection={<IconAbc size={16} />}
-                    value={nomeInput}
-                    onChange={(e) => setNomeInput(e.currentTarget.value)} />
+            <Stack gap={50} w={200} mt={30}>
+                <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const validationResult = form.validate();
+                    if (!validationResult.hasErrors) {
+                        handleAddCategoriaBtn();
+                    }
+                }}>
+                        <TextInput
+                            placeholder="Insira o nome"
+                            label="Nome" description="Nome da categoria"
+                            leftSection={<IconAbc size={16} />}
+                            //value={nomeInput}
+                            value={form.values.name}
+                            error={form.errors.name}
+                            onChange={(e) => {
+                                form.setFieldValue('name', e.currentTarget.value)
+                                setNomeInput(e.currentTarget.value)
+                            }} />
+                        <NumberInput
+                            mt={20}
+                            label="Imposto"
+                            description="Imposto cobrado sobre os produtos"
+                            placeholder="Imposto"
+                            allowNegative={false}
+                            decimalScale={2}
+                            decimalSeparator=","
+                            min={0}
+                            max={10000}
+                            hideControls
+                            //value={impostoInput}
+                            value={form.values.tax}
+                            error={form.errors.tax}
+                            onChange={(e) => {
+                                form.setFieldValue('tax', +e.valueOf())
+                                setImpostoInput(e.valueOf())
+                            }}
+                            leftSection={<IconPercentage size={16} />}
+                        />
+                        <Group mt={30}>
+                            <Button type="submit">Inserir</Button>
+                        </Group>
+                </form>
+            </Stack>
 
-                <NumberInput
-                    label="Imposto"
-                    description="Imposto cobrado sobre os produtos"
-                    placeholder="Imposto"
-                    allowNegative={false}
-                    decimalScale={2}
-                    decimalSeparator=","
-                    min={0}
-                    max={10000}
-                    hideControls
-                    value={impostoInput}
-                    onChange={(e) => {
-                        setImpostoInput(e.valueOf())
-                    }}
-                    leftSection={<IconPercentage size={16} />}
-                />
-            </Group>
-            <Group mt={20}>
-                <Button onClick={handleAddCategoriaBtn}>Inserir</Button>
-            </Group>
         </Container>
     )
 }

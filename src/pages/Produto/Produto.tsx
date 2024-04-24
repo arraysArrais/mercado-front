@@ -1,5 +1,5 @@
 import { DataTable } from 'mantine-datatable';
-import { ActionIcon, Box, Button, Container, Flex, Group, Input, InputBase, Modal, NumberInput, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { ActionIcon, Button, Container, Flex, Group, InputBase, Modal, NumberInput, Select, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import useApi from '../../services/services';
@@ -41,6 +41,25 @@ export const Produto = () => {
         validate: zodResolver(schema),
     });
 
+    const editSchema = z.object({
+        name: z.string().min(5, { message: 'O novo nome deve ter pelo menos 5 caracteres' }).optional().or(z.literal('')),
+        price: z.number().min(1, { message: 'O novo preço deve ser maior que zero' }).optional().or(z.literal('')),
+        description: z.string().min(3, { message: 'A nova descrição deve ter pelo menos 3 caracteres' }).optional().or(z.literal('')),
+        category_id: z.string().min(1, { message: 'Deve ser selecionada uma categoria' }).optional().or(z.literal('')),
+        code: z.string().min(5, { message: 'Código do produto deve conter pelo menos 5 caracteres' }).optional().or(z.literal('')),
+    });
+
+
+    const editForm = useForm({
+        initialValues: {
+            name: '',
+            price: 5,
+            description: '',
+            category_id: '',
+            code: '',
+        },
+        validate: zodResolver(editSchema),
+    })
 
     useEffect(() => {
         async function dataFetch() {
@@ -73,6 +92,40 @@ export const Produto = () => {
         dataFetch();
     }, [products])
 
+    const handleEditProduto = async () => {
+
+        const payload = {
+            name,
+            price,
+            description,
+            category_id: selectedCategoryId,
+            code,
+        }
+        let result = await apiServices.updateProduct(payload, editProduto);
+
+        if (result.error) {
+            notifications.show({
+                title: 'Erro',
+                message: result.error,
+                color: 'red'
+            });
+        }
+        else if (result[0].id) {
+            notifications.show({
+                title: 'Sucesso',
+                message: 'Alteração realizada',
+                color: 'green'
+            });
+        }
+        else
+        notifications.show({
+            title: 'Erro',
+            message: 'Erro ao enviar requisição para o servidor',
+            color: 'red'
+        });
+        closeEditModal();
+        console.log("RESULTADO DA ALTERAÇÃO!!", result);
+    }
 
     return (
         <Container size={'100%'}>
@@ -97,92 +150,77 @@ export const Produto = () => {
                 </Flex>
             </Modal>
             <Modal opened={editModal} onClose={closeEditModal} title="Alteração">
+
                 <Stack>
-                    <InputBase
-                        type="text"
-                        placeholder="Nome"
-                        value={form.values.name}
-                        onChange={(e) => {
-                            form.setFieldValue('name', e.currentTarget.value)
-                            setName(e.currentTarget.value)
-                        }}
-                        error={form.errors.name}
-                    />
-                    <InputBase
-                        type="text"
-                        placeholder="Descrição"
-                        value={description}
-                        onChange={(e) => {
-                            form.setFieldValue('description', e.currentTarget.value)
-                            setDescription(e.currentTarget.value)
-                        }}
-                        error={form.errors.description}
-                    />
-                    <NumberInput
-                        placeholder="Preço"
-                        prefix="R$ "
-                        allowNegative={false}
-                        decimalScale={2}
-                        decimalSeparator=","
-                        min={0}
-                        max={10000}
-                        hideControls
-                        value={price}
-                        onChange={(e: any) => {
-                            form.setFieldValue('price', +e.valueOf())
-                            setPrice(+e.valueOf())
-                        }}
-                        error={form.errors.price}
-                    />
-                    <Select
-                        placeholder="Categoria"
-                        data={categories.map(category => ({ label: category.name, value: category.id.toString() }))}
-                        value={selectedCategoryId}
-                        onChange={(selectedOption) => {
-                            setSelectedCategoryId(selectedOption?.valueOf())
-                            form.setFieldValue('category_id', selectedOption?.valueOf())
-                        }}
-                        error={form.errors.category_id}
-                    />
-                    <InputBase
-                        type="text"
-                        placeholder="Código"
-                        value={code}
-                        onChange={(e) => {
-                            setCode(e.currentTarget.value)
-                            form.setFieldValue('code', e.currentTarget.value)
-                        }}
-                        error={form.errors.code}
-                    />
-                    <Button mt={40} type='submit' onClick={async () => {
-                        const payload = {
-                            name,
-                            price,
-                            description,
-                            category_id: selectedCategoryId,
-                            code,
-                        }
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
 
-                        let result = await apiServices.updateProduct(payload, editProduto);
-
-                        if (result[0].id) {
-                            notifications.show({
-                                title: 'Sucesso',
-                                message: 'Alteração realizada',
-                                color: 'green'
-                            });
+                        const validationResult = editForm.validate();
+                        console.log("VALIDACAO EDIT", validationResult)
+                        if (!validationResult.hasErrors) {
+                            handleEditProduto();
                         }
-                        else {
-                            notifications.show({
-                                title: 'Erro',
-                                message: result.error,
-                                color: 'red'
-                            });
-                        }
-                        closeEditModal();
-
-                        console.log("RESULTADO DA ALTERAÇÃO!!", result);
-                    }}>Inserir</Button>
+                    }}>
+                        <Stack gap={20}>
+                            <InputBase
+                                type="text"
+                                placeholder="Nome"
+                                value={editForm.values.name}
+                                onChange={(e) => {
+                                    editForm.setFieldValue('name', e.currentTarget.value)
+                                    setName(e.currentTarget.value)
+                                }}
+                                error={editForm.errors.name}
+                            />
+                            <InputBase
+                                type="text"
+                                placeholder="Descrição"
+                                value={description}
+                                onChange={(e) => {
+                                    editForm.setFieldValue('description', e.currentTarget.value)
+                                    setDescription(e.currentTarget.value)
+                                }}
+                                error={editForm.errors.description}
+                            />
+                            <NumberInput
+                                placeholder="Preço"
+                                prefix="R$ "
+                                allowNegative={false}
+                                decimalScale={2}
+                                decimalSeparator=","
+                                min={0}
+                                max={10000}
+                                hideControls
+                                value={price}
+                                onChange={(e: any) => {
+                                    editForm.setFieldValue('price', +e.valueOf())
+                                    setPrice(+e.valueOf())
+                                }}
+                                error={editForm.errors.price}
+                            />
+                            <Select
+                                placeholder="Categoria"
+                                data={categories.map(category => ({ label: category.name, value: category.id.toString() }))}
+                                value={selectedCategoryId}
+                                onChange={(selectedOption) => {
+                                    setSelectedCategoryId(selectedOption?.valueOf())
+                                    editForm.setFieldValue('category_id', selectedOption?.valueOf())
+                                }}
+                                error={editForm.errors.category_id}
+                            />
+                            <InputBase
+                                type="text"
+                                placeholder="Código"
+                                value={code}
+                                onChange={(e) => {
+                                    setCode(e.currentTarget.value)
+                                    editForm.setFieldValue('code', e.currentTarget.value)
+                                }}
+                                error={editForm.errors.code}
+                            />
+                            <Button mt={10} type='submit' color='orange'>Atualizar</Button>
+                        </Stack>
+                    </form>
                 </Stack>
             </Modal>
             <Modal opened={opened} onClose={close} title="Cadastro de produto">
@@ -228,7 +266,6 @@ export const Produto = () => {
                             })
                             setProducts(currentProducts);
 
-                            //zera states
                             close();
                         }
                     }}>
@@ -325,15 +362,9 @@ export const Produto = () => {
                                     variant='subtle'
                                     size="sm"
                                     color="yellow"
-                                    onClick={() => {
-                                        setName('')
-                                        setPrice(0)
-                                        setSelectedCategoryId(0)
-                                        setCode('')
-                                        setDescription('')
-
-                                        openEditModal();
+                                    onClick={async () => {
                                         setEditProduto(produto.id)
+                                        openEditModal();
                                     }}
                                 >
                                     <IconPencil size={20} />
@@ -343,8 +374,11 @@ export const Produto = () => {
                 ]}
                 records={products}
                 noRecordsText="Nenhum produto encontrado"
+                height={500}
+                withTableBorder
+                borderRadius={10}
             />
-            <Group mt={20}>
+            <Group mt={30}>
                 <Button onClick={() => open()}>Adicionar produto</Button>
             </Group>
         </Container>

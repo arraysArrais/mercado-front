@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Container, Flex, Group, Input, NumberInput, Stack, Text, Title, Modal, Divider } from '@mantine/core';
+import { ActionIcon, Button, Container, Flex, Group, Input, NumberInput, Stack, Text, Title, Modal } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
 import './style.css';
 import { useEffect, useState } from 'react';
@@ -135,7 +135,7 @@ export const Venda = () => {
                     noRecordsText="Nenhum produto inserido"
                 />
             </Stack>
-            <Flex justify="space-between" mt={50} >
+            <Flex justify="space-between" mt={30} >
                 <Stack gap={30} align='start' >
                     <Group>
                         <Input

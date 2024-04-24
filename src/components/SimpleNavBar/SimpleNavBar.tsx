@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Tooltip, UnstyledButton, Stack, rem } from '@mantine/core';
 import {
     IconHome2,
-    IconLogout,
-    IconPlus,
+   /*  IconLogout, */
     IconShoppingCartSearch,
     IconCategoryPlus,
     IconCoin,
@@ -31,19 +30,19 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 
 const mockdata = [
     { icon: IconHome2, label: 'Home', link: '/' },
-    { icon: IconCategoryPlus, label: 'Categoria', link: '/categoria' },
+    { icon: IconCategoryPlus, label: 'Categorias', link: '/categoria' },
     { icon: IconBarcode, label: 'Produtos', link: '/produto'},
     { icon: IconCoin, label: 'Registrar venda', link: '/venda' },
     { icon: IconShoppingCartSearch, label: 'Consultar Vendas', link: '/consultarVenda'},
 ];
 
-const logoutSection = [
+/* const logoutSection = [
     { icon: IconLogout, label: 'Logout', link: '/logout' },
-]
+] */
 
 export const SimpleNavbar = () => {
     const [active, setActive] = useState(0);
-    const [activeBottom, setActiveBottom] = useState(1);
+    //const [activeBottom, setActiveBottom] = useState(1);
     const navigate = useNavigate();
     const links = mockdata.map((e, index) => (
         <NavbarLink
@@ -56,7 +55,7 @@ export const SimpleNavbar = () => {
             }}
         />
     ));
-    const logoutLinks = logoutSection.map((e, index) => (
+    /* const logoutLinks = logoutSection.map((e, index) => (
         <NavbarLink
             {...e}
             key={e.label}
@@ -67,7 +66,7 @@ export const SimpleNavbar = () => {
                 navigate("/login")
             }}
         />
-    ))
+    )) */
 
     return (
         <nav className={classes.navbar}>

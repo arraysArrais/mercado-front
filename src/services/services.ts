@@ -33,6 +33,9 @@ export default () => {
             codigo = codigo.replace("'", "");
             return request('get', `/item`, { codigo }, localStorage.getItem('token'))
         },
+        getItemByid: async (id: any) => {
+            return request('get', `/item/${id}`, {}, localStorage.getItem('token'))
+        },
         sendTransaction: async (payload: any) => {
             return request('post', `/transaction`, payload, localStorage.getItem('token'))
         },
