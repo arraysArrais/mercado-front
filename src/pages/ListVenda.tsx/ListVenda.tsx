@@ -1,4 +1,4 @@
-import { Container, Divider, Group, Modal, Stack, Text, Title } from '@mantine/core';
+import { Container, Divider, Group, Stack, Text, Title } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
 import './style.css';
 import { useEffect, useState } from 'react';
@@ -64,14 +64,14 @@ export const ListVenda = () => {
                     className='table'
                     height={500}
                     noRecordsText="Nenhuma registro de venda encontrado"
-                    onRowClick={({ record, index, event }) => {
+                    onRowClick={({ record }) => {
                         handleRowExpansionData(record.id);
 
                     }}
                     rowExpansion={{
-                        content: ({ record }) => (
+                        content: () => (
                             <Stack className={classes.details} p="xs" gap={6}>
-                                {venda.products.map((product: any, index: any) => (
+                                {venda.products.map((product: any) => (
                                     <div>
                                         <Group gap={6}>
                                             <Text size='mdsm'>{product.name} {/* Código: {product.codigo} Categoria: {product.categoria} */}</Text>

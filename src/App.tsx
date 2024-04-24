@@ -5,6 +5,7 @@ import { MainRoutes } from './routes/MainRoutes';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/core/styles.layer.css';
 import 'mantine-datatable/styles.layer.css';
+import '@mantine/notifications/styles.css';
 
 const myColor: MantineColorsTuple = [
   '#f3edff',
@@ -36,8 +37,8 @@ const theme = createTheme({
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
+      <Notifications />
       <ModalsProvider>
-        <Notifications />
         <MainRoutes />
       </ModalsProvider>
     </MantineProvider>

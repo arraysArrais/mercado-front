@@ -1,12 +1,12 @@
-import { ActionIcon, Button, Container, Flex, Group, Input, NumberInput, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Container, Flex, Group, Input, NumberInput, Stack, Text, Title, Modal, Divider } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
 import './style.css';
 import { useEffect, useState } from 'react';
 import { IconNumber123, IconTrash } from '@tabler/icons-react';
 import useApi from '../../services/services';
 import { v4 as uuidv4 } from 'uuid';
-
-
+import { notifications } from '@mantine/notifications';
+import { useDisclosure } from '@mantine/hooks';
 
 export const Venda = () => {
     const apiServices = useApi();
@@ -15,11 +15,13 @@ export const Venda = () => {
     const [quantidadeInput, setQuantidadeInput] = useState<number>(1);
     const [valorTotal, setValorTotal] = useState<number>(0);
     const [imposto, setImposto] = useState<number>(0);
+    const [opened, { open, close }] = useDisclosure(false);
+    const [temporaryItem, setTemporaryItem] = useState<any>();
 
     useEffect(() => {
         console.log("Valor de item ", item)
         //soma total e impostos
-        if(item.length > 0){
+        if (item.length > 0) {
             let valores = item.map((e) => +e.Valor);
             console.log(valores)
             let total = valores.reduce((anterior, prox) => +anterior + +prox)
@@ -29,7 +31,7 @@ export const Venda = () => {
             let totalImpostos = impostos.reduce((anterior, prox) => +anterior + +prox)
             setImposto(+totalImpostos.toFixed(2))
         }
-        
+
     }, [item])
 
     const columns = [
@@ -49,14 +51,10 @@ export const Venda = () => {
                         size="sm"
                         color="red"
                         onClick={() => {
-                            //TODO: modal de confirmação para exclusão
-
+                            open();
                             // filtra os itens para remover o item clicado
                             const updatedItems = item.filter((item: any) => item.id !== produto.id);
-
-                            setItem(updatedItems);
-
-                            //TODO: notificação de exclusão
+                            setTemporaryItem(updatedItems); //será usado posteriormente
                         }}
                     >
                         <IconTrash size={20} />
@@ -69,13 +67,16 @@ export const Venda = () => {
         const result = await apiServices.getItemByCodigo(codigo);
 
         if (!result[0].codigo) {
-            //TODO: notificação de item não encontrado.
+            notifications.show({
+                title: 'Erro',
+                message: 'Item não encontrado!',
+                color: 'red'
+            })
             return;
         }
 
         const currentItems = [...item];
 
-        //TODO: trocar quantidade por state do input de qtd
         for (let i = 0; i < +quantidadeInput; i++) {
             currentItems.push({
                 // gera id para ser utilizado pelo front para montar os itens do carrinho, 
@@ -93,16 +94,35 @@ export const Venda = () => {
 
         setItem(currentItems);
 
-        //TODO: notificação de adição
+        notifications.show({
+            title: 'Carrinho modificado',
+            message: 'Item adicionado ao carrinho!',
+            color: 'green'
+        })
     }
 
-    const handleCloseSaleBtn = async () => {
-        const result = await apiServices.sendTransaction(item);
-    }
 
     return (
         <Container size={'100%'} id='container'>
-            <Title order={1} id='titulo'>Caixa aberto</Title>
+            <Modal opened={opened} onClose={close} title="Confirmação">
+                <Text>Tem certeza que deseja excluir o item?</Text>
+                <Flex justify={'end'} gap={30} mt={30}>
+
+                    <Button onClick={() => {
+                        setItem(temporaryItem)
+                        notifications.show({
+                            title: 'Carrinho modificado',
+                            message: 'Item excluído do carrinho!',
+                            color: 'yellow'
+                        })
+                        close();
+                    }}>Sim</Button>
+                    <Button color='red' onClick={() => {
+                        close();
+                    }}>Não</Button>
+                </Flex>
+            </Modal>
+            <Title order={1} id='titulo'>Registrar venda</Title>
             <Stack align='end' >
                 <DataTable
                     columns={columns}
@@ -145,7 +165,7 @@ export const Venda = () => {
                 <Stack align='end'>
                     <Text size='lg' fw={500}>Total: R$ {valorTotal.toString()}</Text>
                     <Text size='xs' fw={500}>Impostos: R$ {imposto.toString()}</Text>
-                    <Button onClick={handleCloseSaleBtn}>Concluir</Button>
+                    <Button onClick={async () => await apiServices.sendTransaction(item)}>Concluir</Button>
                 </Stack>
             </Flex>
         </Container>
