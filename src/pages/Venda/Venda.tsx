@@ -109,7 +109,7 @@ export const Venda = () => {
             color: 'green'
         })
 
-        setCodigoInput(0)
+        setCodigoInput('')
     }
 
     const handleCloseSaleBtn = async (item: any) => {
