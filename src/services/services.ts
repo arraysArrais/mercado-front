@@ -51,5 +51,17 @@ export default () => {
         updateCategory: async (payload: any, id: number) => {
             return request('PATCH', `/category/${id}`, payload, localStorage.getItem('token'))
         },
+        createProduct: async (payload: any) => {
+            return request('POST', `/item`, payload, localStorage.getItem('token'))
+        },
+        getProducts: async () => {
+            return request('get', `/item`, {scope:'completeScope'}, localStorage.getItem('token'))
+        },
+        deleteProduct: async(id: any) => {
+            return request('DELETE', `/item/${id}`, {}, localStorage.getItem('token'))
+        },
+        updateProduct: async (payload: any, id: number) => {
+            return request('PATCH', `/item/${id}`, payload, localStorage.getItem('token'))
+        },
     }
 }
