@@ -101,6 +101,27 @@ export const Venda = () => {
         })
     }
 
+    const handleCloseSaleBtn = async (item: any) => {
+        let result = await apiServices.sendTransaction(item);
+
+        if (result[0].id_transaction) {
+            notifications.show({
+                title: 'Notificação',
+                message: 'Venda registrada com sucesso!',
+                color: 'green'
+            })
+        }
+        else {
+            notifications.show({
+                title: 'Erro',
+                message: 'Erro ao registrar venda.',
+                color: 'red'
+            })
+        }
+
+        setItem([]);
+    }
+
 
     return (
         <Container size={'100%'} id='container'>
@@ -165,7 +186,9 @@ export const Venda = () => {
                 <Stack align='end'>
                     <Text size='lg' fw={500}>Total: R$ {valorTotal.toString()}</Text>
                     <Text size='xs' fw={500}>Impostos: R$ {imposto.toString()}</Text>
-                    <Button onClick={async () => await apiServices.sendTransaction(item)}>Concluir</Button>
+                    <Button onClick={() => {
+                        handleCloseSaleBtn(item)
+                    }}>Concluir</Button>
                 </Stack>
             </Flex>
         </Container>
