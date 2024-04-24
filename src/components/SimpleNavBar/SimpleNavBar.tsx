@@ -5,7 +5,9 @@ import {
     IconLogout,
     IconPlus,
     IconShoppingCart,
-    IconShoppingCartSearch
+    IconShoppingCartSearch,
+    IconCategoryPlus,
+    IconCoin
 } from '@tabler/icons-react';
 import classes from './NavbarMinimal.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -29,9 +31,9 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 
 const mockdata = [
     { icon: IconHome2, label: 'Home', link: '/' },
-    { icon: IconShoppingCart, label: 'Cadastrar venda', link: '/venda' },
-    { icon: IconShoppingCartSearch, label: 'Listar Vendas', link: '/consultarVenda'},
-    { icon: IconPlus, label: 'Menu item 2', link: '/teste' },
+    { icon: IconCategoryPlus, label: 'Categoria', link: '/categoria' },
+    { icon: IconCoin, label: 'Registrar venda', link: '/venda' },
+    { icon: IconShoppingCartSearch, label: 'Consultar Vendas', link: '/consultarVenda'},
 ];
 
 const logoutSection = [
@@ -73,9 +75,9 @@ export const SimpleNavbar = () => {
                     {links}
                 </Stack>
             </div>
-                <Stack justify="center" gap={0}>
+                {/* <Stack justify="center" gap={0}>
                     {logoutLinks}
-                </Stack>
+                </Stack> */}
         </nav>
     );
 }

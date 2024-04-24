@@ -122,7 +122,7 @@ export const Venda = () => {
                     }}>Não</Button>
                 </Flex>
             </Modal>
-            <Title order={1} id='titulo'>Registrar venda</Title>
+            <Title order={2} id='titulo' >Registrar venda</Title>
             <Stack align='end' >
                 <DataTable
                     columns={columns}

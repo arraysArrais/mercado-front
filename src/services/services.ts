@@ -30,15 +30,26 @@ const request = async (method: string, endpoint: string, params: any, token: str
 export default () => {
     return {
         getItemByCodigo: async (codigo: string) => {
-            codigo = codigo.replace("'", ""); 
-            return request('get', `/item`, {codigo}, localStorage.getItem('token'))
+            codigo = codigo.replace("'", "");
+            return request('get', `/item`, { codigo }, localStorage.getItem('token'))
         },
-        sendTransaction: async (sale: any) => {
-            console.log("sale: ", sale)
-            return request('post', `/transaction`, sale, localStorage.getItem('token'))
+        sendTransaction: async (payload: any) => {
+            return request('post', `/transaction`, payload, localStorage.getItem('token'))
         },
-        listTransaction: async () =>{
+        listTransaction: async () => {
             return request('get', `/transaction`, {}, localStorage.getItem('token'))
-        }
+        },
+        createCategory: async (payload: any) => {
+            return request('post', `/category`, payload, localStorage.getItem('token'))
+        },
+        getCategories: async () => {
+            return request('get', `/category`, {}, localStorage.getItem('token'))
+        },
+        deleteCategory: async (id: number) => {
+            return request('DELETE', `/category/${id}`, {}, localStorage.getItem('token'))
+        },
+        updateCategory: async (payload: any, id: number) => {
+            return request('PATCH', `/category/${id}`, payload, localStorage.getItem('token'))
+        },
     }
 }

@@ -1,6 +1,5 @@
 import { Container, Divider, Group, Stack, Text, Title } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
-import './style.css';
 import { useEffect, useState } from 'react';
 import useApi from '../../services/services';
 import classes from './RowExpansion.module.css';
@@ -53,7 +52,7 @@ export const ListVenda = () => {
 
     return (
         <Container size={'100%'} id='container'>
-            <Title order={1} id='titulo'>Listar Vendas</Title>
+            <Title order={2} id='titulo'>Listar Vendas</Title>
             <Stack align='end' >
                 <DataTable
                     columns={columns}
