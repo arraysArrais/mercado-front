@@ -2,13 +2,14 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Login } from '../pages/Login/Login'
 import { Home } from '../pages/Home/Home'
-import { ProtectRoute } from './ProtectRoute'
+//import { ProtectRoute } from './ProtectRoute'
 import { NotFound } from '../pages/NotFound/NotFound'
 import { BasicAppShell } from '../layout/BasicAppShell'
-import { RedirectLogin } from './RedirectLogin'
+//import { RedirectLogin } from './RedirectLogin'
 import { Venda } from '../pages/Venda/Venda'
 import { ListVenda } from '../pages/ListVenda.tsx/ListVenda'
 import { Categoria } from '../pages/Categoria/Categoria'
+import { Produto } from '../pages/Produto/Produto'
 
 
 export const MainRoutes = () => {
@@ -19,6 +20,7 @@ export const MainRoutes = () => {
                 <Route path="/venda" element={<BasicAppShell><Venda /></BasicAppShell>} />
                 <Route path="/consultarVenda" element={<BasicAppShell><ListVenda /></BasicAppShell>} />
                 <Route path="/categoria" element={<BasicAppShell><Categoria /></BasicAppShell>} />
+                <Route path="/produto" element={<BasicAppShell><Produto /></BasicAppShell>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

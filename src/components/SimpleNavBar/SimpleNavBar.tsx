@@ -4,7 +4,6 @@ import {
     IconHome2,
     IconLogout,
     IconPlus,
-    IconShoppingCart,
     IconShoppingCartSearch,
     IconCategoryPlus,
     IconCoin
@@ -32,6 +31,7 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 const mockdata = [
     { icon: IconHome2, label: 'Home', link: '/' },
     { icon: IconCategoryPlus, label: 'Categoria', link: '/categoria' },
+    { icon: IconPlus, label: 'Produtos', link: '/produto'},
     { icon: IconCoin, label: 'Registrar venda', link: '/venda' },
     { icon: IconShoppingCartSearch, label: 'Consultar Vendas', link: '/consultarVenda'},
 ];
