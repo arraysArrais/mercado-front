@@ -17,6 +17,7 @@ export const Venda = () => {
     const [imposto, setImposto] = useState<number>(0);
     const [opened, { open, close }] = useDisclosure(false);
     const [temporaryItem, setTemporaryItem] = useState<any>();
+    const [valorComImposto, setValorComImposto] = useState<any>(0);
 
     useEffect(() => {
         console.log("Valor de item ", item)
@@ -30,6 +31,8 @@ export const Venda = () => {
             let impostos = item.map((e) => +e.Imposto);
             let totalImpostos = impostos.reduce((anterior, prox) => +anterior + +prox)
             setImposto(+totalImpostos.toFixed(2))
+
+            setValorComImposto(+total + +totalImpostos)
         }
 
         if(item.length == 0){
@@ -189,8 +192,9 @@ export const Venda = () => {
                 </Stack>
 
                 <Stack align='end'>
-                    <Text size='lg' fw={500}>Total: R$ {valorTotal.toString()}</Text>
+                    <Text size='xs' fw={500}>Total: R$ {valorTotal.toString()}</Text>
                     <Text size='xs' fw={500}>Impostos: R$ {imposto.toString()}</Text>
+                    <Text size='md' fw={500}>Total (com impostos): R$ {valorComImposto}</Text>
                     <Button onClick={() => {
                         handleCloseSaleBtn(item)
                     }}>Concluir</Button>
