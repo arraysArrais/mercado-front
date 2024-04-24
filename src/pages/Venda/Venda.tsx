@@ -195,9 +195,9 @@ export const Venda = () => {
                 </Stack>
 
                 <Stack align='end'>
-                    <Text size='xs' fw={500}>Total: R$ {valorTotal.toString()}</Text>
-                    <Text size='xs' fw={500}>Impostos: R$ {imposto.toString()}</Text>
-                    <Text size='md' fw={500}>Total (com impostos): R$ {valorComImposto}</Text>
+                    <Text size='xs' fw={500}>Total: R$ {valorTotal.toFixed(2)}</Text>
+                    <Text size='xs' fw={500}>Impostos: R$ {imposto.toFixed(2)}</Text>
+                    <Text size='md' fw={500}>Total (com impostos): R$ {valorComImposto.toFixed(2)}</Text>
                     <Button onClick={() => {
                         handleCloseSaleBtn(item)
                     }}>Concluir</Button>
