@@ -108,6 +108,8 @@ export const Venda = () => {
             message: 'Item adicionado ao carrinho!',
             color: 'green'
         })
+
+        setCodigoInput(0)
     }
 
     const handleCloseSaleBtn = async (item: any) => {
