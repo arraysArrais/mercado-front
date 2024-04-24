@@ -34,6 +34,20 @@ export const Categoria = () => {
         validate: zodResolver(schema),
     });
 
+    const editSchema = z.object({
+        name: z.string().min(5, { message: 'O novo nome deve ter pelo menos 5 caracteres' }).optional().or(z.literal('')),
+        tax: z.number().min(1, { message: 'O novo imposto deve ser maior que zero' }).optional().or(z.literal('')),
+    });
+
+
+    const editForm = useForm({
+        initialValues: {
+            name: '',
+            tax: 0,
+        },
+        validate: zodResolver(editSchema),
+    })
+
     useEffect(() => {
 
         async function dataFetch() {
@@ -148,7 +162,7 @@ export const Categoria = () => {
                 <Box >
                     <form onSubmit={async (e) => {
                         e.preventDefault();
-                        const validationResult = form.validate();
+                        const validationResult = editForm.validate();
 
                         if (!validationResult.hasErrors) {
                             handleEditCategoriaBtn();
@@ -159,10 +173,10 @@ export const Categoria = () => {
                             <TextInput
                                 placeholder="Novo nome"
                                 leftSection={<IconAbc size={16} />}
-                                value={form.values.name}
-                                error={form.errors.name}
+                                value={editForm.values.name}
+                                error={editForm.errors.name}
                                 onChange={(e) => {
-                                    form.setFieldValue('name', e.currentTarget.value)
+                                    editForm.setFieldValue('name', e.currentTarget.value)
                                     setNomeInput(e.currentTarget.value)
                                 }} />
                             <NumberInput
@@ -173,10 +187,10 @@ export const Categoria = () => {
                                 min={0}
                                 max={10000}
                                 hideControls
-                                value={form.values.tax}
-                                error={form.errors.tax}
+                                value={editForm.values.tax}
+                                error={editForm.errors.tax}
                                 onChange={(e) => {
-                                    form.setFieldValue('tax', +e.valueOf())
+                                    editForm.setFieldValue('tax', +e.valueOf())
                                     setImpostoInput(e.valueOf())
                                 }}
                                 leftSection={<IconPercentage size={16} />}
@@ -244,40 +258,40 @@ export const Categoria = () => {
                         handleAddCategoriaBtn();
                     }
                 }}>
-                        <TextInput
-                            placeholder="Insira o nome"
-                            label="Nome" description="Nome da categoria"
-                            leftSection={<IconAbc size={16} />}
-                            //value={nomeInput}
-                            value={form.values.name}
-                            error={form.errors.name}
-                            onChange={(e) => {
-                                form.setFieldValue('name', e.currentTarget.value)
-                                setNomeInput(e.currentTarget.value)
-                            }} />
-                        <NumberInput
-                            mt={20}
-                            label="Imposto"
-                            description="Imposto cobrado sobre os produtos"
-                            placeholder="Imposto"
-                            allowNegative={false}
-                            decimalScale={2}
-                            decimalSeparator=","
-                            min={0}
-                            max={10000}
-                            hideControls
-                            //value={impostoInput}
-                            value={form.values.tax}
-                            error={form.errors.tax}
-                            onChange={(e) => {
-                                form.setFieldValue('tax', +e.valueOf())
-                                setImpostoInput(e.valueOf())
-                            }}
-                            leftSection={<IconPercentage size={16} />}
-                        />
-                        <Group mt={30}>
-                            <Button type="submit">Inserir</Button>
-                        </Group>
+                    <TextInput
+                        placeholder="Insira o nome"
+                        label="Nome" description="Nome da categoria"
+                        leftSection={<IconAbc size={16} />}
+                        //value={nomeInput}
+                        value={form.values.name}
+                        error={form.errors.name}
+                        onChange={(e) => {
+                            form.setFieldValue('name', e.currentTarget.value)
+                            setNomeInput(e.currentTarget.value)
+                        }} />
+                    <NumberInput
+                        mt={20}
+                        label="Imposto"
+                        description="Imposto cobrado sobre os produtos"
+                        placeholder="Imposto"
+                        allowNegative={false}
+                        decimalScale={2}
+                        decimalSeparator=","
+                        min={0}
+                        max={10000}
+                        hideControls
+                        //value={impostoInput}
+                        value={form.values.tax}
+                        error={form.errors.tax}
+                        onChange={(e) => {
+                            form.setFieldValue('tax', +e.valueOf())
+                            setImpostoInput(e.valueOf())
+                        }}
+                        leftSection={<IconPercentage size={16} />}
+                    />
+                    <Group mt={30}>
+                        <Button type="submit">Inserir</Button>
+                    </Group>
                 </form>
             </Stack>
 
