@@ -38,6 +38,7 @@ export const Venda = () => {
         if(item.length == 0){
             setValorTotal(0);
             setImposto(0);
+            setValorComImposto(0);
         }
 
     }, [item])
