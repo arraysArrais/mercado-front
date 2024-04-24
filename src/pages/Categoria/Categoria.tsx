@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Button, Container, Flex, Group, InputBase, Modal, Stack, Text, TextInput, Title } from "@mantine/core"
+import { ActionIcon, Box, Button, Container, Flex, Group, InputBase, Modal, NumberInput, Stack, Text, TextInput, Title } from "@mantine/core"
 import { DataTable } from 'mantine-datatable';
 import { CategoriaProps } from "./types";
 import { useEffect, useState } from "react";
@@ -45,10 +45,9 @@ export const Categoria = () => {
     }, [categorias])
 
     const handleAddCategoriaBtn = async () => {
-        //alert(Number(impostoInput.replace(',', '.')))
         let result = await apiServices.createCategory({
             name: nomeInput,
-            tax_percent: Number((impostoInput.replace(',', '.'))),
+            tax_percent: impostoInput,
         });
 
         console.log("request: ", result);
@@ -80,14 +79,23 @@ export const Categoria = () => {
                 <Flex justify={'end'} gap={30} mt={30}>
 
                     <Button onClick={async () => {
-                        await apiServices.deleteCategory(delCategoria);
+                        let result = await apiServices.deleteCategory(delCategoria);
                         setCategorias(temporaryItem)
+                        if (!result.message) {
+                            notifications.show({
+                                title: 'Erro',
+                                message: 'Erro ao excluir categoria, verifique se a mesma não está vinculada a nenhum produto.',
+                                color: 'red'
+                            })
+                        }
+                        else {
+                            notifications.show({
+                                title: 'Alerta',
+                                message: 'Categoria excluída!',
+                                color: 'yellow'
+                            })
+                        }
 
-                        notifications.show({
-                            title: 'Alerta',
-                            message: 'Categoria excluída!',
-                            color: 'yellow'
-                        })
                         close();
                     }}>Sim</Button>
                     <Button color='red' onClick={() => {
@@ -103,12 +111,18 @@ export const Categoria = () => {
                             leftSection={<IconAbc size={16} />}
                             value={nomeInput}
                             onChange={(e) => setNomeInput(e.currentTarget.value)} />
-                        <InputBase
-                            component={IMaskInput}
-                            mask="00,00"
-                            placeholder="Novo percentual de imposto"
+                        <NumberInput
+                            placeholder="Novo Imposto"
+                            allowNegative={false}
+                            decimalScale={2}
+                            decimalSeparator=","
+                            min={0}
+                            max={10000}
+                            hideControls
                             value={impostoInput}
-                            onChange={(e) => setImpostoInput(e.currentTarget.value)}
+                            onChange={(e) => {
+                                setImpostoInput(e.valueOf())
+                            }}
                             leftSection={<IconPercentage size={16} />}
                         />
                     </Group>
@@ -117,7 +131,7 @@ export const Categoria = () => {
                     <Button onClick={async () => {
                         let result = await apiServices.updateCategory({
                             name: nomeInput,
-                            tax_percent: Number((impostoInput.replace(',', '.'))),
+                            tax_percent: impostoInput,
                         }, editCategoria);
 
                         if (result[0].id) {
@@ -191,14 +205,20 @@ export const Categoria = () => {
                     value={nomeInput}
                     onChange={(e) => setNomeInput(e.currentTarget.value)} />
 
-                <InputBase
-                    component={IMaskInput}
-                    mask="00,00"
+                <NumberInput
                     label="Imposto"
                     description="Imposto cobrado sobre os produtos"
-                    placeholder="Percentual de imposto"
+                    placeholder="Imposto"
+                    allowNegative={false}
+                    decimalScale={2}
+                    decimalSeparator=","
+                    min={0}
+                    max={10000}
+                    hideControls
                     value={impostoInput}
-                    onChange={(e) => setImpostoInput(e.currentTarget.value)}
+                    onChange={(e) => {
+                        setImpostoInput(e.valueOf())
+                    }}
                     leftSection={<IconPercentage size={16} />}
                 />
             </Group>

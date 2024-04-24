@@ -6,7 +6,8 @@ import {
     IconPlus,
     IconShoppingCartSearch,
     IconCategoryPlus,
-    IconCoin
+    IconCoin,
+    IconBarcode
 } from '@tabler/icons-react';
 import classes from './NavbarMinimal.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +32,7 @@ function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
 const mockdata = [
     { icon: IconHome2, label: 'Home', link: '/' },
     { icon: IconCategoryPlus, label: 'Categoria', link: '/categoria' },
-    { icon: IconPlus, label: 'Produtos', link: '/produto'},
+    { icon: IconBarcode, label: 'Produtos', link: '/produto'},
     { icon: IconCoin, label: 'Registrar venda', link: '/venda' },
     { icon: IconShoppingCartSearch, label: 'Consultar Vendas', link: '/consultarVenda'},
 ];

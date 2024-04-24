@@ -1,5 +1,4 @@
 import { DataTable } from 'mantine-datatable';
-import companies from './companies.json';
 import { ActionIcon, Box, Button, Container, Flex, Group, Input, InputBase, Modal, NumberInput, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
@@ -12,8 +11,7 @@ import { IconPencil, IconTrash } from '@tabler/icons-react';
 
 export const Produto = () => {
     const [opened, { open, close }] = useDisclosure(false); //modal para adição de produtos
-    const [delModal, { open: openDelModal, close: closeDelModal }] = useDisclosure(false); //modal para adição de produtos
-    //const [opened, { open, close }] = useDisclosure(false); //modal para adição de produtos
+    const [delModal, { open: openDelModal, close: closeDelModal }] = useDisclosure(false); //modal para deleção de produtos
     const apiServices = useApi();
     const [categories, setCategories] = useState<CategoriaProps[]>([]);
     const [selectedCategoryId, setSelectedCategoryId] = useState<any>();
@@ -73,11 +71,10 @@ export const Produto = () => {
             console.log("produto: ", formattedProducts)
         }
         dataFetch();
-    }, [])
+    }, [products])
 
 
     return (
-
         <Container size={'100%'}>
             <Modal opened={delModal} onClose={closeDelModal} title="Confirmação">
                 <Text>Tem certeza que deseja excluir o produto?</Text>
@@ -221,6 +218,17 @@ export const Produto = () => {
                                     color: 'red'
                                 });
                             }
+                            const currentProducts: any = [...products];
+                            currentProducts.push({
+                                name,
+                                price,
+                                description,
+                                code,
+                                selectedCategoryId,
+                            })
+                            setProducts(currentProducts);
+
+                            //zera states
                             close();
                         }
                     }}>
@@ -334,6 +342,7 @@ export const Produto = () => {
                     },
                 ]}
                 records={products}
+                noRecordsText="Nenhum produto encontrado"
             />
             <Group mt={20}>
                 <Button onClick={() => open()}>Adicionar produto</Button>
