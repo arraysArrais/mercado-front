@@ -15,7 +15,6 @@ export const Categoria = () => {
     const [nomeInput, setNomeInput] = useState<any>('');
     const [impostoInput, setImpostoInput] = useState<any>('');
     const apiServices = useApi();
-    const [temporaryItem, setTemporaryItem] = useState<any>();
     const [opened, { open, close }] = useDisclosure(false); //confirmação de deleção
     const [editModal, { open: openEditModal, close: closeEditModal }] = useDisclosure(false); //edição 
     const [delCategoria, setDelCategoria] = useState<any>(0); //usado para armazenar o ID da categoria em caso de exclusão
@@ -47,30 +46,30 @@ export const Categoria = () => {
         },
         validate: zodResolver(editSchema),
     })
+    const fetchData = async () => {
+        let result = await apiServices.getCategories();
 
-    useEffect(() => {
-
-        async function dataFetch() {
-            let result = await apiServices.getCategories();
-
-            let formatted = result.map((e: any) => {
-                const formattedTax = parseFloat(e.tax_percent).toLocaleString('pt-BR', {
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2,
-                    useGrouping: false,
-                });
-
-                return {
-                    id: e.id,
-                    name: e.name,
-                    tax_percent: `${formattedTax} %`,
-                };
+        let formatted = result.map((e: any) => {
+            const formattedTax = parseFloat(e.tax_percent).toLocaleString('pt-BR', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+                useGrouping: false,
             });
 
-            setCategorias(formatted);
-        }
-        dataFetch();
-    }, [categorias])
+            return {
+                id: e.id,
+                name: e.name,
+                tax_percent: `${formattedTax} %`,
+            };
+        });
+
+        setCategorias(formatted);
+    }
+
+
+    useEffect(() => {
+        fetchData();
+    }, [])
 
     const handleAddCategoriaBtn = async () => {
         let result = await apiServices.createCategory({
@@ -104,6 +103,7 @@ export const Categoria = () => {
         setNomeInput('');
         form.setFieldValue('name', '')
         form.setFieldValue('tax', 0)
+        fetchData();
     }
 
     const handleEditCategoriaBtn = async () => {
@@ -126,6 +126,7 @@ export const Categoria = () => {
                 color: 'red'
             });
         }
+        fetchData();
         closeEditModal();
     }
     return (
@@ -135,7 +136,6 @@ export const Categoria = () => {
                 <Flex justify={'end'} gap={30} mt={30}>
                     <Button onClick={async () => {
                         let result = await apiServices.deleteCategory(delCategoria);
-                        setCategorias(temporaryItem)
                         if (!result.message) {
                             notifications.show({
                                 title: 'Erro',
@@ -150,7 +150,7 @@ export const Categoria = () => {
                                 color: 'yellow'
                             })
                         }
-
+                        fetchData();
                         close();
                     }}>Sim</Button>
                     <Button color='red' onClick={() => {
@@ -191,7 +191,7 @@ export const Categoria = () => {
                                 error={editForm.errors.tax}
                                 onChange={(e) => {
                                     editForm.setFieldValue('tax', +e.valueOf())
-                                    setImpostoInput(e.valueOf())
+                                    setImpostoInput(+e.valueOf())
                                 }}
                                 leftSection={<IconPercentage size={16} />}
                             />
@@ -221,9 +221,6 @@ export const Categoria = () => {
                                     color="red"
                                     onClick={() => {
                                         open();
-                                        // filtra os itens para remover o item clicado
-                                        const updatedItems = categorias.filter((item: any) => item.id !== categoria.id);
-                                        setTemporaryItem(updatedItems); //será usado posteriormente
                                         setDelCategoria(categoria.id)
                                     }}
                                 >
@@ -233,11 +230,17 @@ export const Categoria = () => {
                                     variant='subtle'
                                     size="sm"
                                     color="yellow"
-                                    onClick={() => {
-                                        setNomeInput('');
-                                        setImpostoInput('');
+                                    onClick={async () => {
+                                        let result = await apiServices.getCategory(categoria.id);
+                                        editForm.setFieldValue('name', result[0].name);
+                                        editForm.setFieldValue('tax', +result[0].tax_percent);
+                                        setNomeInput(result[0].name);
+                                        setImpostoInput(result[0].tax_percent);
+
+
+                                        setEditCategoria(categoria.id);
                                         openEditModal();
-                                        setEditCategoria(categoria.id)
+                                        
                                     }}
                                 >
                                     <IconPencil size={20} />

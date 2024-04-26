@@ -48,6 +48,9 @@ export default () => {
         getCategories: async () => {
             return request('get', `/category`, {}, localStorage.getItem('token'))
         },
+        getCategory: async (id: number) => {
+            return request('get', `/category/${id}`, {}, localStorage.getItem('token'))
+        },
         deleteCategory: async (id: number) => {
             return request('DELETE', `/category/${id}`, {}, localStorage.getItem('token'))
         },
