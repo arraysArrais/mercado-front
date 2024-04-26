@@ -14,7 +14,7 @@ export const Produto = () => {
     const [delModal, { open: openDelModal, close: closeDelModal }] = useDisclosure(false); //modal para deleção de produtos
     const apiServices = useApi();
     const [categories, setCategories] = useState<CategoriaProps[]>([]);
-    const [selectedCategoryId, setSelectedCategoryId] = useState<any>();
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState(0);
@@ -22,7 +22,6 @@ export const Produto = () => {
     const [products, setProducts] = useState([])
     const [delProduto, setDelProduto] = useState<any>(0); //usado para armazenar o ID do produto em caso de exclusão
     const [editProduto, setEditProduto] = useState<any>(0); //usado para armazenar o ID do produto em caso de edição
-    const [temporaryProducts, setTemporaryProducts] = useState<any>()
     const [editModal, { open: openEditModal, close: closeEditModal }] = useDisclosure(false); //edição 
 
     const schema = z.object({
@@ -62,38 +61,20 @@ export const Produto = () => {
     })
 
     useEffect(() => {
-        async function dataFetch() {
-            let categoryData = await apiServices.getCategories();
-            setCategories(categoryData)
+        fetchData()
 
-            let productData = await apiServices.getProducts();
+    }, [])
 
-            let formattedProducts = productData.map((e: any) => {
-                const formattedPrice = parseFloat(e.price).toLocaleString('pt-BR', {
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2,
-                    useGrouping: false,
-                });
-
-                return {
-                    id: e.id,
-                    name: e.name,
-                    description: e.description,
-                    category: e.category,
-                    codigo: e.codigo,
-                    price: `R$ ${formattedPrice}`
-                };
-            });
-
-            setProducts(formattedProducts)
-
-            console.log("produto: ", formattedProducts)
-        }
-        dataFetch();
-    }, [products])
+    const clearAddInputs = () => {
+        setName('')
+        form.setFieldValue('name', '')
+        setDescription('')
+        setPrice(0)
+        setCode('')
+        setSelectedCategoryId('')
+    }
 
     const handleEditProduto = async () => {
-
         const payload = {
             name,
             price,
@@ -118,13 +99,89 @@ export const Produto = () => {
             });
         }
         else
-        notifications.show({
-            title: 'Erro',
-            message: 'Erro ao enviar requisição para o servidor',
-            color: 'red'
-        });
+            notifications.show({
+                title: 'Erro',
+                message: 'Erro ao enviar requisição para o servidor',
+                color: 'red'
+            });
+        fetchData();
         closeEditModal();
-        console.log("RESULTADO DA ALTERAÇÃO!!", result);
+    }
+
+    const handleAddProduto = async () => {
+        const payload = {
+            name,
+            price,
+            description,
+            category_id: selectedCategoryId,
+            code
+        }
+        //request pra api
+        let result = await apiServices.createProduct(payload);
+        if (result[0].id) {
+            notifications.show({
+                title: 'Sucesso',
+                message: 'Produto cadastrado',
+                color: 'green'
+            });
+        }
+        else {
+            notifications.show({
+                title: 'Erro',
+                message: (result.error ? result.error : "Erro ao enviar requisição para o servidor"),
+                color: 'red'
+            });
+        }
+        fetchData(); //faz requisição para api e atualiza dados em tela
+
+        close();
+    }
+
+    const handleDelProduto = async () => {
+        let result = await apiServices.deleteProduct(delProduto)
+        if (result.message) {
+            notifications.show({
+                title: 'Alerta',
+                message: 'Produto excluído!',
+                color: 'yellow'
+            })
+        }
+        else {
+            notifications.show({
+                title: 'Erro',
+                message: "Erro ao excluir produto, verifique se o mesmo não está vinculado a uma venda",
+                color: 'red'
+            });
+        }
+        fetchData(); // atualiza tela
+        setDelProduto(0); //zera state usado pra armazenar id do produto a ser deletado
+        closeDelModal();
+    }
+
+    const fetchData = async () => {
+        let categoryData = await apiServices.getCategories();
+        setCategories(categoryData)
+
+        let productData = await apiServices.getProducts();
+
+        let formattedProducts = productData.map((e: any) => {
+            const formattedPrice = parseFloat(e.price).toLocaleString('pt-BR', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+                useGrouping: false,
+            });
+
+            return {
+                id: e.id,
+                name: e.name,
+                description: e.description,
+                category: e.category,
+                codigo: e.codigo,
+                price: `R$ ${formattedPrice}`
+            };
+        });
+
+        setProducts(formattedProducts)
     }
 
     return (
@@ -133,41 +190,16 @@ export const Produto = () => {
                 <Text>Tem certeza que deseja excluir o produto?</Text>
                 <Flex justify={'end'} gap={30} mt={30}>
 
-                    <Button onClick={async () => {
-                        let result = await apiServices.deleteProduct(delProduto)
-                        setProducts(temporaryProducts);
-
-                        if(result.message){
-                            notifications.show({
-                                title: 'Alerta',
-                                message: 'Produto excluído!',
-                                color: 'yellow'
-                            })
-                        }
-                        else{
-                            notifications.show({
-                                title: 'Erro',
-                                message: "Erro ao excluir produto, verifique se o mesmo não está vinculado a uma venda",
-                                color: 'red'
-                            });
-                        }
-                        
-                        setDelProduto(0);
-                        closeDelModal();
-                    }}>Sim</Button>
-                    <Button color='red' onClick={() => {
-                        closeDelModal();
-                    }}>Não</Button>
+                    <Button onClick={handleDelProduto}>Sim</Button>
+                    <Button color='red' onClick={closeDelModal}>Não</Button>
                 </Flex>
             </Modal>
             <Modal opened={editModal} onClose={closeEditModal} title="Alteração">
-
                 <Stack>
                     <form onSubmit={(e) => {
                         e.preventDefault();
 
                         const validationResult = editForm.validate();
-                        console.log("VALIDACAO EDIT", validationResult)
                         if (!validationResult.hasErrors) {
                             handleEditProduto();
                         }
@@ -244,40 +276,8 @@ export const Produto = () => {
                         const validationResult = form.validate();
                         console.log(validationResult)
                         if (!validationResult.hasErrors) {
-                            const payload = {
-                                name,
-                                price,
-                                description,
-                                category_id: selectedCategoryId,
-                                code
-                            }
-                            //request pra api
-                            let result = await apiServices.createProduct(payload);
-                            if (result[0].id) {
-                                notifications.show({
-                                    title: 'Sucesso',
-                                    message: 'Produto cadastrado',
-                                    color: 'green'
-                                });
-                            }
-                            else {
-                                notifications.show({
-                                    title: 'Erro',
-                                    message: (result.error ? result.error : "Erro ao enviar requisição para o servidor"),
-                                    color: 'red'
-                                });
-                            }
-                            const currentProducts: any = [...products];
-                            currentProducts.push({
-                                name,
-                                price,
-                                description,
-                                code,
-                                selectedCategoryId,
-                            })
-                            setProducts(currentProducts);
-
-                            close();
+                            handleAddProduto();
+                            clearAddInputs();
                         }
                     }}>
                         <Stack>
@@ -361,9 +361,6 @@ export const Produto = () => {
                                     color="red"
                                     onClick={async () => {
                                         openDelModal();
-                                        const updatedProducts = products.filter((product: any) => product.id !== produto.id);
-                                        setTemporaryProducts(updatedProducts); //será usado posteriormente
-
                                         setDelProduto(produto.id);
                                     }}
                                 >
@@ -374,12 +371,23 @@ export const Produto = () => {
                                     size="sm"
                                     color="yellow"
                                     onClick={async () => {
-                                        setName('')
-                                        setDescription('')
-                                        setPrice(0)
-                                        setCode('')
+                                        let result = await apiServices.getItemByCodigo(produto.codigo);
+                                        setSelectedCategoryId(result[0].category_id.toString())
 
-                                        setSelectedCategoryId(null)
+                                        editForm.setFieldValue('name', result[0].name)
+                                        setName(result[0].name)
+
+                                        editForm.setFieldValue('description', result[0].description)
+                                        setDescription(result[0].description)
+
+                                        editForm.setFieldValue('price', +result[0].price)
+                                        setPrice(result[0].price)
+
+                                        editForm.setFieldValue('codigo', result[0].codigo)
+                                        setCode(result[0].codigo)
+
+                                        editForm.setFieldValue('category_id', selectedCategoryId ?? '')
+
                                         setEditProduto(produto.id)
                                         openEditModal();
                                     }}
